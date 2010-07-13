@@ -54,7 +54,9 @@ class RMUirc < Sinatra::Base
   get '/old' do
     session!
 
-    menu + File.open('archive.html') {|f| f.read }
+    @body = File.open( File.expand_path(File.dirname(__FILE__)+'/archive.html') ) {|f| f.read }
+    
+    erb :archive
   end
   
   get '/' do
