@@ -1,7 +1,6 @@
-<% if !@feed.nil? then %>
-<%= leaf(collection, :previous_label => 'Older', :next_label => 'Newer') %>
+<%= leaf(collection, :previous_label => "newer", :next_label => 'older') %>
 	<div id='content'>
-		<% collection.each do |row| %>
+		<% collection.reverse.each do |row| %>
 			<% next if row.nil? %>
 			<div class='message'>
 				<div class='timestamp'><%= h Time.parse( row['timestamp'].to_s ).strftime('%b %d, %H:%M:%S')%></div>
@@ -21,4 +20,3 @@
 			</div>
 		<% end %>
 	</div>
-<% end %>

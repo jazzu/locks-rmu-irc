@@ -3,13 +3,24 @@ require 'sinatra/session'
 
 require 'httparty'
 require 'leaf'
+require 'leaf/array'
 
 include Leaf::ViewHelpers::Base
 
 class RMUirc < Sinatra::Base
+class Log
+  include HTTParty
+
+  base_uri 'http://rmuapi.heroku.com/'
+  format :json
+end
+end
+
+class RMUirc
   register Sinatra::Session
 
   set :public, File.expand_path( File.dirname(__FILE__) + '/public')
+
   set :session_fail, '/login'
   set :session_secret, 'babot is my'
 
@@ -18,14 +29,12 @@ class RMUirc < Sinatra::Base
   helpers do
     include Rack::Utils
     alias_method :h, :escape_html
+    
+    def page_size
+      50
+    end
   end
 
-  class Log
-    include HTTParty
-
-    base_uri 'http://rmuapi.heroku.com/'
-    format :json
-  end
 
 ## LOGIN LOGIc
 #
@@ -58,25 +67,20 @@ class RMUirc < Sinatra::Base
     
     erb :archive
   end
-  
+
   get '/' do
     session!
+    session[:log] = Log.get('/irc/log') if !session[:log]
 
-    @feed = Log.get('/irc/log') if !@feed
-
-    page_size = 50
-    page = (params[:page]) ? params[:page] : last=(@feed.size/page_size).succ
-    
-    @feed = Log.get('/irc/log') if last
+    page = params[:page] ? params[:page] : 1
 
     erb :logs, :locals => { 
-      :collection => @feed.paginate({
-      :page => page,
-      :per_page => page_size
-    }) 
-  }
+      :collection => session[:log].reverse.paginate({
+        :page => page,
+        :per_page => 50
+      }) 
+    }
   end
-
 end
 
 __END__
