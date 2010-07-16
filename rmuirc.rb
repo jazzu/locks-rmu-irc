@@ -33,6 +33,11 @@ class RMUirc
     def page_size
       50
     end
+
+    def parse_links(line)
+      link_re = %r{((?:(?:ftp|http|https|gopher|mailto|news|nntp|telnet|wais|file|prospero|aim|webcal):(?:(?:[A-Za-z0-9$_.+!*(),;\/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(?:#(?:[a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;\/?:@&~=%-]*))?(?:[A-Za-z0-9$_+!*();\/?:~-])))}
+      line.gsub(link_re, '<a href="\1">\1</a>')
+    end
   end
 
 
